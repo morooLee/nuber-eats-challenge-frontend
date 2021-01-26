@@ -6,7 +6,7 @@ export const isLoggedInVar = makeVar(Boolean(token));
 export const authTokenVar = makeVar(token);
 
 export const client = new ApolloClient({
-  uri: 'http://localhost:4000/graphql',
+  uri: 'https://nuber-eats-challenge-backend.herokuapp.com/graphql',
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
