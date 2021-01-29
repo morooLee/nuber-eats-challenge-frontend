@@ -11,6 +11,9 @@ import {
 import nuberLogo from '../../images/logo.svg';
 import facebookLogo from '../../images/facebook.svg';
 import { Link } from 'react-router-dom';
+import { FormError } from '../../components/common/FormError';
+import { Button } from '../../components/common/Button';
+import { Header } from '../../components/Header';
 
 const SIGN_IN_MUTATION = gql`
   mutation signInMutation($signInInput: SignInInput!) {
@@ -68,33 +71,42 @@ export const SignIn: React.FC = () => {
       <Helmet>
         <title>Sign In | Nuber Eats</title>
       </Helmet>
+      <Header disableBackButton={true} />
       <div className="w-full max-w-screen-sm h-screen flex flex-col px-5 items-center justify-center">
         <img src={nuberLogo} className="w-52 mb-10" alt="Nuber Eats" />
         <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
-          <div>
+          <div className="mb-3">
             <input
-              className="min-w-full focus:outline-none focus:border-gray-500 p-3 border bg-gray-50 rounded-md text-sm border-gray-200 transition-colors mb-3"
+              className="input"
               name="email"
               id-="email"
               type="email"
-              placeholder="이메일을 입력해 주세요."
+              placeholder="email address"
               required
-              ref={register({ required: '이메일을 입력해 주세요.' })}
+              ref={register({
+                required: 'Email is required',
+                pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+              })}
             ></input>
-            {errors.email?.message && <span>{errors.email?.message}</span>}
+            {errors.email?.type === 'pattern' && (
+              <FormError errorMessage={'Please enter a valid email'} />
+            )}
+            {errors.email?.message && (
+              <FormError errorMessage={errors.email?.message} />
+            )}
           </div>
-          <div>
+          <div className="mb-3">
             <input
-              className="min-w-full focus:outline-none focus:border-gray-500 p-3 border bg-gray-50 rounded-md text-sm border-gray-200 transition-colors mb-3"
+              className="input"
               name="password"
               id="password"
               type="password"
-              placeholder="비밀번호를 입력해 주세요."
+              placeholder="password"
               required
-              ref={register({ required: '비밀번호를 입력해 주세요.' })}
+              ref={register({ required: 'Password is required' })}
             ></input>
             {errors.password?.message && (
-              <span>{errors.password?.message}</span>
+              <FormError errorMessage={errors.password?.message} />
             )}
           </div>
           <div className="text-right">
@@ -102,15 +114,15 @@ export const SignIn: React.FC = () => {
               Forgotten password?
             </span>
           </div>
-          <div>
-            <button
-              className="min-w-full focus:outline-none p-3 bg-blue-300 rounded-md text-sm text-white transition-colors my-6"
-              disabled={!formState.isValid}
-            >
-              {loading ? 'Loading...' : 'Sign In'}
-            </button>
+          <div className="my-6">
+            <Button
+              canClick={formState.isValid}
+              loading={loading}
+              actionText={'Sign In'}
+            />
+
             {signInMutationResult?.signIn.error && (
-              <span>{signInMutationResult?.signIn.error}</span>
+              <FormError errorMessage={signInMutationResult.signIn.error} />
             )}
           </div>
           <div className="min-w-full flex items-center">
@@ -123,6 +135,15 @@ export const SignIn: React.FC = () => {
             <span className="text-blue-400 text-sm">Sign in with Facebook</span>
           </div>
         </form>
+        <div className="absolute min-w-full inset-x-0 bottom-0 mb-5 text-center">
+          <hr className="my-5" />
+          <span className="text-xs text-gray-500">
+            Dont't have an account?{' '}
+            <Link to="/signup" className="text-blue-400">
+              Sign up
+            </Link>
+          </span>
+        </div>
       </div>
     </>
   );
